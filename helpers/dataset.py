@@ -21,7 +21,7 @@ class BarkVN50Dataset(Dataset):
         for i, path in enumerate(self.image_paths):
             self.images[i] = decode_image(path)
 
-            # labelling the images
+            # labelling the images (one-hot encoding)
             # fmt:off
             tree_species = path.split(sep="/")[-2]
             if   tree_species == "Adenanthera microsperma": self.labels[i] = tensor([1, 0, 0, 0, 0]) # noqa: E701
@@ -32,6 +32,7 @@ class BarkVN50Dataset(Dataset):
             else:                                           self.labels[i] = tensor([0, 0, 0, 0, 0]) # noqa: E701
             # fmt:on
 
+        self.images = self.images / 256
         self.images = self.images.to(device=self.device, dtype=float32)
         self.labels = self.labels.to(device=self.device, dtype=float32)
 

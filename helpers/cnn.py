@@ -29,7 +29,7 @@ class ConvolutionalNeuralNetwork(Module):
         )
         """
 
-        self.categorizer = Sequential(
+        self.classifier = Sequential(
             Linear(in_features=8 * 101 * 75, out_features=64 * 75),
             ReLU(),
             Linear(in_features=64 * 75, out_features=5),
@@ -39,5 +39,5 @@ class ConvolutionalNeuralNetwork(Module):
         x = x.requires_grad_(True)
         x = self.cnn(x)
         x = x.view(x.size(0), -1)
-        x = self.categorizer(x)
+        x = self.classifier(x)
         return x
