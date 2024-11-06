@@ -11,11 +11,11 @@ def evaluate_cnn(
     criterion: CrossEntropyLoss,
 ):
     with no_grad():
-        evaluate_dataset(test_dataloader, model, criterion)
-        evaluate_dataset(train_dataloader, model, criterion)
+        _evaluate_dataset(test_dataloader, model, criterion)
+        _evaluate_dataset(train_dataloader, model, criterion)
 
 
-def evaluate_dataset(
+def _evaluate_dataset(
     dataloader: DataLoader,
     model: ConvolutionalNeuralNetwork,
     criterion: CrossEntropyLoss,
@@ -35,5 +35,5 @@ def evaluate_dataset(
             correct_count += 1
 
     print(
-        f"Number Of Images Tested {all_count}, Loss: {loss.item():.4f}, Accuracy ={correct_count / all_count}"
+        f"Number Of Images Tested {all_count}, Loss: {loss.item():.4f}, Accuracy: {correct_count / all_count}"
     )
