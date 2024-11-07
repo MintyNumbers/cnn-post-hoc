@@ -2,7 +2,7 @@ from torch.utils.data import DataLoader
 from helpers.cnn import ConvolutionalNeuralNetwork
 from torch.nn import CrossEntropyLoss
 from torch import Tensor, no_grad
-from helper_functions import predict_label
+from helpers.functions import predict_label
 
 
 def evaluate_cnn(

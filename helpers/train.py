@@ -4,7 +4,7 @@ from torch.optim import Adam
 from torch.nn import CrossEntropyLoss
 from torch import Tensor, save
 from datetime import datetime
-from helpers.helper_functions import predict_label
+from helpers.functions import predict_label
 
 
 def train_cnn(
