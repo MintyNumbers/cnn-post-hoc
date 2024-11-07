@@ -1,7 +1,8 @@
 from torch.utils.data import DataLoader
 from helpers.cnn import ConvolutionalNeuralNetwork
 from torch.nn import CrossEntropyLoss
-from torch import Tensor, max, no_grad
+from torch import Tensor, no_grad
+from helper_functions import predict_label
 
 
 def evaluate_cnn(
@@ -28,11 +29,8 @@ def _evaluate_dataset(
         loss: Tensor = criterion(outputs, true_labels)
 
         # predict labels
-        _, pred_labels = max(outputs, 1)
-        _, true_labels = max(true_labels, 1)
-        all_count += pred_labels.shape[0]
-        if pred_labels == true_labels:
-            correct_count += 1
+        all_count += outputs.shape[0]
+        correct_count += predict_label(outputs=outputs, targets=true_labels)
 
     print(
         f"Number Of Images Tested {all_count}, Loss: {loss.item():.4f}, Accuracy: {correct_count / all_count}"

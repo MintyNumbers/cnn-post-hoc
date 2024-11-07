@@ -2,8 +2,9 @@ from torch.utils.data import DataLoader
 from helpers.cnn import ConvolutionalNeuralNetwork
 from torch.optim import Adam
 from torch.nn import CrossEntropyLoss
-from torch import Tensor, max, save
+from torch import Tensor, save
 from datetime import datetime
+from helpers.helper_functions import predict_label
 
 
 def train_cnn(
@@ -25,12 +26,8 @@ def train_cnn(
             loss: Tensor = criterion(outputs, true_labels)
 
             # predict labels
-            _, pred_labels = max(outputs, 1)
-            _, true_labels = max(true_labels, 1)
-            all_count += pred_labels.shape[0]
-            for i in range(pred_labels.shape[0]):
-                if pred_labels[i] == true_labels[i]:
-                    correct_count += 1
+            all_count += outputs.shape[0]
+            correct_count += predict_label(outputs=outputs, targets=true_labels)
 
             # Backward pass and optimization
             optimizer.zero_grad()
