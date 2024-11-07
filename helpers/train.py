@@ -22,6 +22,7 @@ def train_cnn(
 
         for images, true_labels in dataloader:
             # Forward pass
+            images: Tensor = images.requires_grad_(True)
             outputs: Tensor = model(images)
             loss: Tensor = criterion(outputs, true_labels)
 

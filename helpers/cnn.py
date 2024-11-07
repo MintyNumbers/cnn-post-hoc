@@ -36,7 +36,6 @@ class ConvolutionalNeuralNetwork(Module):
         )
 
     def forward(self, x: Tensor) -> Tensor:
-        x = x.requires_grad_(True)
         x = self.cnn(x)
         x = x.view(x.size(0), -1)
         x = self.classifier(x)
