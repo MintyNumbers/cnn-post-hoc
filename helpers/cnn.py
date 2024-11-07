@@ -8,7 +8,7 @@ class ConvolutionalNeuralNetwork(Module):
         super(ConvolutionalNeuralNetwork, self).__init__()
 
         self.cnn = Sequential(
-            Conv2d(in_channels=3, out_channels=4, kernel_size=3, padding=1),
+            Conv2d(in_channels=1, out_channels=4, kernel_size=3, padding=1),
             ReLU(),
             MaxPool2d(kernel_size=2, stride=2, padding=0),
             Conv2d(in_channels=4, out_channels=8, kernel_size=3, padding=1),

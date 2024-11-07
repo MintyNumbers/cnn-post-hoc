@@ -3,6 +3,7 @@ from torch import Tensor, tensor, float32
 from torchvision.io import decode_image
 from glob import glob
 from torch import device, empty
+from torchvision.transforms.functional import rgb_to_grayscale
 
 
 class BarkVN50Dataset(Dataset):
@@ -15,11 +16,11 @@ class BarkVN50Dataset(Dataset):
             self.image_paths = glob("./data/BarkVN-50/Test/*/*")
         self.image_paths.sort()
 
-        # loading images into memory as tensors
-        self.images = empty(self.image_paths.__len__(), 3, 404, 303)
+        # loading images into memory as tensors and transforming them from RGB to grayscale
+        self.images = empty(self.image_paths.__len__(), 1, 404, 303)
         self.labels = empty(self.image_paths.__len__(), 5)
         for i, path in enumerate(self.image_paths):
-            self.images[i] = decode_image(path)
+            self.images[i] = rgb_to_grayscale(decode_image(path))
 
             # labelling the images (one-hot encoding)
             # fmt:off

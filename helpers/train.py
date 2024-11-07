@@ -49,7 +49,7 @@ def train_cnn(
             )
 
         print(
-            f"Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}, Accuracy = {(correct_count / all_count)*100}",
+            f"Epoch [{epoch+1}/{num_epochs}],\tLoss: {loss.item():.4f},\tAccuracy: {((correct_count / all_count)*100):.4f}",
         )
 
         # TODO: Log the running loss

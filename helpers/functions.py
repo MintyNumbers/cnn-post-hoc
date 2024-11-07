@@ -10,5 +10,8 @@ def predict_label(targets: Tensor, outputs: Tensor) -> int:
         for i in range(pred_labels.shape[0]):
             if pred_labels[i] == true_labels[i]:
                 correct_count += 1
+    else:
+        if pred_labels == true_labels:
+            correct_count += 1
 
     return correct_count

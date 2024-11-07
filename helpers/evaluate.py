@@ -33,5 +33,5 @@ def _evaluate_dataset(
         correct_count += predict_label(outputs=outputs, targets=true_labels)
 
     print(
-        f"Number Of Images Tested {all_count}, Loss: {loss.item():.4f}, Accuracy: {correct_count / all_count}"
+        f"Number Of Images Tested {all_count},\tLoss: {loss.item():.4f},\tAccuracy: {correct_count / all_count}"
     )
