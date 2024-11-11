@@ -1,4 +1,4 @@
-from torch.nn import Module, Sequential, Conv2d, MaxPool2d, Linear, ReLU
+from torch.nn import Module, Sequential, Conv2d, MaxPool2d, Linear, ReLU, Softmax, BatchNorm2d, BatchNorm1d
 from torch import Tensor
 
 
@@ -10,9 +10,11 @@ class ConvolutionalNeuralNetwork(Module):
         self.cnn = Sequential(
             Conv2d(in_channels=1, out_channels=4, kernel_size=3, padding=1),
             ReLU(),
+            BatchNorm2d(num_features=4),
             MaxPool2d(kernel_size=2, stride=2, padding=0),
             Conv2d(in_channels=4, out_channels=8, kernel_size=3, padding=1),
             ReLU(),
+            BatchNorm2d(num_features=8),
             MaxPool2d(kernel_size=2, stride=2, padding=0),
         )
 
@@ -32,7 +34,9 @@ class ConvolutionalNeuralNetwork(Module):
         self.classifier = Sequential(
             Linear(in_features=8 * 101 * 75, out_features=64 * 75),
             ReLU(),
+            BatchNorm1d(64 * 75),
             Linear(in_features=64 * 75, out_features=5),
+            Softmax(dim=1),
         )
 
     def forward(self, x: Tensor) -> Tensor:
