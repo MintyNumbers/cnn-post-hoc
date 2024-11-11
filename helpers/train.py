@@ -38,7 +38,7 @@ def train_cnn(
             # running_loss += loss.item()
 
         # save checkpoint
-        if epoch % 100 == 0:
+        if epoch % 10 == 0:
             save(
                 {
                     "epoch": num_epochs,
