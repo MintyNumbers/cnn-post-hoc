@@ -1,10 +1,12 @@
-from torch.utils.data import DataLoader
-from helpers.cnn import ConvolutionalNeuralNetwork
-from torch.optim import Adam
-from torch.nn import CrossEntropyLoss
-from torch import Tensor, save
 from datetime import datetime
-from helpers.functions import predict_label
+
+from torch import Tensor, save
+from torch.nn import CrossEntropyLoss
+from torch.optim import Adam
+from torch.utils.data import DataLoader
+
+from helpers.cnn import ConvolutionalNeuralNetwork
+from helpers.functions import count_correct_label_batch
 
 
 def train_cnn(
@@ -28,7 +30,7 @@ def train_cnn(
 
             # predict labels
             all_count += outputs.shape[0]
-            correct_count += predict_label(outputs=outputs, targets=true_labels)
+            correct_count += count_correct_label_batch(outputs=outputs, targets=true_labels)
 
             # Backward pass and optimization
             optimizer.zero_grad()
@@ -38,7 +40,7 @@ def train_cnn(
             # running_loss += loss.item()
 
         # save checkpoint
-        if epoch % 10 == 0:
+        if epoch % 10 == 0 and epoch != 0:
             save(
                 {
                     "epoch": num_epochs,

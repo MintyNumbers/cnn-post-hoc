@@ -1,8 +1,8 @@
-from torch.utils.data import Dataset
-from torch import Tensor, tensor, float32
-from torchvision.io import decode_image
 from glob import glob
-from torch import device, empty
+
+from torch import Tensor, device, empty, float32, tensor
+from torch.utils.data import Dataset
+from torchvision.io import decode_image
 from torchvision.transforms.functional import rgb_to_grayscale
 
 

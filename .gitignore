@@ -164,6 +164,5 @@ cython_debug/
 
 data
 models
-ruff.toml
-settings.json
 _test_.py
+.vscode

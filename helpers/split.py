@@ -1,5 +1,5 @@
-from os import makedirs
 from glob import glob
+from os import makedirs
 from shutil import copy
 
 
@@ -24,9 +24,7 @@ def train_test_split() -> None:
     for species in TREE_SPECIES:
         makedirs(f"./data/BarkVN-50/Train/{species}", exist_ok=False)
         makedirs(f"./data/BarkVN-50/Test/{species}", exist_ok=False)
-        image_paths: list[str] = glob(
-            f"./data/BarkVN-50/BarkVN-50_mendeley/{species}/*"
-        )
+        image_paths: list[str] = glob(f"./data/BarkVN-50/BarkVN-50_mendeley/{species}/*")
         image_paths.sort()
         train_test_split_index = int(image_paths.__len__() * 0.9)
 
