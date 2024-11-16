@@ -1,46 +1,30 @@
-from torch.nn import Module, Sequential, Conv2d, MaxPool2d, Linear, ReLU, Softmax, BatchNorm2d, BatchNorm1d
 from torch import Tensor
+from torch.nn import BatchNorm2d, Conv2d, Flatten, Linear, MaxPool2d, Module, ReLU, Sequential, Softmax
 
 
 class ConvolutionalNeuralNetwork(Module):
     def __init__(self):
-        """CNN model for classifying bark images (303x404 pixels)."""
+        """CNN model for classifying bark images (1*404*303)."""
         super(ConvolutionalNeuralNetwork, self).__init__()
 
         self.cnn = Sequential(
-            Conv2d(in_channels=1, out_channels=4, kernel_size=3, padding=1),
+            Conv2d(in_channels=1, out_channels=64, kernel_size=7, padding=3, stride=1),  # 64 * 404 * 303
             ReLU(),
-            BatchNorm2d(num_features=4),
-            MaxPool2d(kernel_size=2, stride=2, padding=0),
-            Conv2d(in_channels=4, out_channels=8, kernel_size=3, padding=1),
+            BatchNorm2d(num_features=64),
+            MaxPool2d(kernel_size=7, stride=7, padding=0),  # 64 * 57 * 43
+            Conv2d(in_channels=64, out_channels=128, kernel_size=7, padding=3, stride=1),  # 128 * 57 * 43
             ReLU(),
-            BatchNorm2d(num_features=8),
-            MaxPool2d(kernel_size=2, stride=2, padding=0),
+            BatchNorm2d(num_features=128),
+            MaxPool2d(kernel_size=7, stride=7, padding=0),  # 128 * 8 * 6
+            Flatten(),
         )
-
-        """
-        self.cnn = Sequential(
-            Conv2d(3, 32, kernel_size=3, stride=1, padding=1),
-            BatchNorm2d(4),
-            ReLU(inplace=True),
-            MaxPool2d(kernel_size=2, stride=2),
-            Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
-            BatchNorm2d(4),
-            ReLU(inplace=True),
-            MaxPool2d(kernel_size=2, stride=2),
-        )
-        """
 
         self.classifier = Sequential(
-            Linear(in_features=8 * 101 * 75, out_features=64 * 75),
-            ReLU(),
-            BatchNorm1d(64 * 75),
-            Linear(in_features=64 * 75, out_features=5),
+            Linear(in_features=128 * 8 * 6, out_features=5),
             Softmax(dim=1),
         )
 
     def forward(self, x: Tensor) -> Tensor:
         x = self.cnn(x)
-        x = x.view(x.size(0), -1)
         x = self.classifier(x)
         return x
