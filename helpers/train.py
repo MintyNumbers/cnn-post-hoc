@@ -4,6 +4,7 @@ from torch import Tensor, save
 from torch.nn import CrossEntropyLoss
 from torch.optim import Adam
 from torch.utils.data import DataLoader
+from tqdm.notebook import tqdm
 
 from helpers.cnn import ConvolutionalNeuralNetwork
 from helpers.functions import count_correct_label_batch
@@ -18,6 +19,7 @@ def train_cnn(
 ):
     time = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
 
+    pbar = tqdm(total=num_epochs, desc="Epoch")
     for epoch in range(num_epochs):
         correct_count, all_count = 0, 0
         # running_loss = 0.0
@@ -51,8 +53,7 @@ def train_cnn(
                 f"models/checkpoint-{epoch}ep-{time}.tar",
             )
 
-        print(
-            f"Epoch [{epoch+1}/{num_epochs}],\tLoss: {loss.item():.4f},\tAccuracy: {((correct_count / all_count)*100):.4f}",
-        )
+        pbar.write(f"Epoch: {epoch},\tLoss: {loss.item():.4f},\tAccuracy: {((correct_count / all_count)*100):.4f}")
+        pbar.update(1)
 
         # TODO: Log the running loss

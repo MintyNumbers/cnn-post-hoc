@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from torch import Tensor, clamp, mean, randn
 from torch.nn import Module
 from torch.optim import Adam
-from tqdm import tqdm
+from tqdm.notebook import trange
 
 from helpers.cnn import ConvolutionalNeuralNetwork
 
@@ -101,7 +101,7 @@ def filter_activation_maximization(
     # maximize each filter's activations
     maximized_images = []
     num_filters = 32
-    for filter_index in tqdm(range(num_filters)):
+    for filter_index in trange(num_filters, desc="Filter"):
         am_image = maximize(filter_index=filter_index)
         maximized_images.append(am_image)
 
