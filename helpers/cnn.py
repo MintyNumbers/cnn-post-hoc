@@ -1,5 +1,5 @@
 from torch import Tensor
-from torch.nn import BatchNorm2d, Conv2d, Flatten, Linear, MaxPool2d, Module, ReLU, Sequential, Softmax
+from torch.nn import BatchNorm2d, Conv2d, Flatten, Linear, MaxPool2d, Module, ReLU, Sequential
 
 
 class ConvolutionalNeuralNetwork(Module):
@@ -20,8 +20,7 @@ class ConvolutionalNeuralNetwork(Module):
         )
 
         self.classifier = Sequential(
-            Linear(in_features=128 * 8 * 6, out_features=5),
-            Softmax(dim=1),
+            Linear(in_features=64 * 16 * 12, out_features=5),
         )
 
     def forward(self, x: Tensor) -> Tensor:

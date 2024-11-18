@@ -19,7 +19,6 @@ def setup_hooks(model: ConvolutionalNeuralNetwork, activations: dict[str, Tensor
     for i in range(9):
         model.cnn[i].register_forward_hook(on_activation(f"cnn{i}"))
     model.classifier[0].register_forward_hook(on_activation("linear"))
-    model.classifier[1].register_forward_hook(on_activation("softmax"))
 
     return activations
 
