@@ -48,7 +48,7 @@ def train_cnn(
                     "epoch": num_epochs,
                     "model_state_dict": model.state_dict(),
                     "optimizer_state_dict": optimizer.state_dict(),
-                    "loss": 123,
+                    "loss": loss.detach(),
                 },
                 f"models/checkpoint-{epoch}ep-{time}.tar",
             )
