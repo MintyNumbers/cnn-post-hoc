@@ -4,17 +4,19 @@ from sklearn.model_selection import KFold
 from torch import Tensor, device, no_grad, save
 from torch.nn import CrossEntropyLoss
 from torch.optim import Adam
-from torch.utils.data import DataLoader, Dataset, SubsetRandomSampler
+from torch.utils.data import DataLoader, SubsetRandomSampler
 from tqdm.notebook import tqdm
 
 from helpers.cnn import ConvolutionalNeuralNetwork
+from helpers.dataset import BarkVN50Dataset
 from helpers.functions import count_correct_label_batch
 
 
 def train_cnn_kfold(
     epoch_per_kfold: int,
     num_kfold: int,
-    train_dataset: Dataset,
+    train_dataset: BarkVN50Dataset,
+    test_loader: DataLoader,
     criterion: CrossEntropyLoss,
     learning_rate: float,
     weight_decay: float,
@@ -71,6 +73,7 @@ def train_cnn_kfold(
     time = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     kf = KFold(n_splits=num_kfold, shuffle=True, random_state=0)
     pbar = tqdm(total=num_kfold, desc="K Fold")
+    pbar.write("K-Fold\tLoss\t\tAccuracy")
     for fold, (train_idx, test_idx) in enumerate(kf.split(train_dataset)):
         model = ConvolutionalNeuralNetwork().to(device)
         optimizer = Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
@@ -80,12 +83,15 @@ def train_cnn_kfold(
         train_loader = DataLoader(dataset=train_dataset, batch_size=40, sampler=SubsetRandomSampler(train_idx))
         train_loss, train_acc = train_kfold(epoch_per_kfold, train_loader)
 
-        # Test resulting model
+        # Validate and Test resulting model
         model.eval()
-        test_loader = DataLoader(dataset=train_dataset, batch_size=40, sampler=SubsetRandomSampler(test_idx))
+        valid_loader = DataLoader(dataset=train_dataset, batch_size=40, sampler=SubsetRandomSampler(test_idx))
+        valid_loss, valid_acc = eval_kfold(valid_loader)
         test_loss, test_acc = eval_kfold(test_loader)
 
-        pbar.write(
-            f"K Fold: {fold}\tTrain Loss: {train_loss.item():.4f},\tTrain Accuracy: {train_acc:.4f}\tTest Loss: {test_loss.item():.4f},\tTest Accuracy: {test_acc:.4f}"
-        )
+        # fmt:off
+        pbar.write(f"{fold}\tTrain:  {train_loss.item():.4f}\tTrain:  {train_acc:.4f}")
+        pbar.write(      f"\tValid.: {valid_loss.item():.4f}\tValid.: {valid_acc:.4f}")
+        pbar.write(      f"\tTest:   {test_loss.item():.4f}\tTest:   {test_acc:.4f}\n")
         pbar.update(1)
+        # fmt:on
