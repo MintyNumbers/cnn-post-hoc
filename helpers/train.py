@@ -16,13 +16,12 @@ def train_cnn(
     model: ConvolutionalNeuralNetwork,
     criterion: CrossEntropyLoss,
     optimizer: Adam,
-):
+) -> Tensor:
     time = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
 
     pbar = tqdm(total=num_epochs, desc="Epoch")
-    for epoch in range(num_epochs):
+    for epoch in range(1, num_epochs + 1):
         correct_count, all_count = 0, 0
-        # running_loss = 0.0
 
         for images, true_labels in dataloader:
             # Forward pass
@@ -39,10 +38,8 @@ def train_cnn(
             loss.backward()
             optimizer.step()
 
-            # running_loss += loss.item()
-
         # save checkpoint
-        if epoch % 10 == 0 and epoch != 0:
+        if epoch % 10 == 0:
             save(
                 {
                     "epoch": num_epochs,
@@ -56,4 +53,4 @@ def train_cnn(
         pbar.write(f"Epoch: {epoch},\tLoss: {loss.item():.4f},\tAccuracy: {((correct_count / all_count)*100):.4f}")
         pbar.update(1)
 
-        # TODO: Log the running loss
+    return loss
