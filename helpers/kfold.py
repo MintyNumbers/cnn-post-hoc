@@ -3,7 +3,7 @@ from datetime import datetime
 from sklearn.model_selection import KFold
 from torch import Tensor, device, no_grad, save
 from torch.nn import CrossEntropyLoss
-from torch.optim import Adam
+from torch.optim import SGD, Adam
 from torch.utils.data import DataLoader, SubsetRandomSampler
 from tqdm.notebook import tqdm
 
@@ -18,6 +18,7 @@ def train_cnn_kfold(
     train_dataset: BarkVN50Dataset,
     test_loader: DataLoader,
     criterion: CrossEntropyLoss,
+    sgd: bool,
     learning_rate: float,
     weight_decay: float,
     device: device,
@@ -71,12 +72,16 @@ def train_cnn_kfold(
         return loss, 100 * correct_count / all_count
 
     time = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+
     kf = KFold(n_splits=num_kfold, shuffle=True, random_state=0)
-    pbar = tqdm(total=num_kfold, desc="K Fold")
+    pbar = tqdm(total=num_kfold, desc="K-Fold")
     pbar.write("K-Fold\tLoss\t\tAccuracy")
     for fold, (train_idx, test_idx) in enumerate(kf.split(train_dataset)):
         model = ConvolutionalNeuralNetwork().to(device)
-        optimizer = Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
+        if sgd:
+            optimizer = SGD(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
+        else:
+            optimizer = Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
 
         # Train model with each K-Fold
         model.train()
