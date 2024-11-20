@@ -54,6 +54,8 @@ def train_cnn_kfold(
                     f"models/kfold-{time}-{fold}.tar",
                 )
 
+            pbar.update(1)
+
         return loss, 100 * correct_count / all_count
 
     def eval_kfold(test_loader):
@@ -74,7 +76,7 @@ def train_cnn_kfold(
     time = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
 
     kf = KFold(n_splits=num_kfold, shuffle=True, random_state=0)
-    pbar = tqdm(total=num_kfold, desc="K-Fold")
+    pbar = tqdm(total=num_kfold * epoch_per_kfold, desc="K-Fold Epochs")
     pbar.write("K-Fold\tLoss\t\tAccuracy")
     for fold, (train_idx, test_idx) in enumerate(kf.split(train_dataset), 1):
         model = ConvolutionalNeuralNetwork().to(device)
@@ -98,5 +100,4 @@ def train_cnn_kfold(
         pbar.write(f"{fold}\tTrain:  {train_loss.item():.4f}\tTrain:  {train_acc:.4f}")
         pbar.write(      f"\tValid.: {valid_loss.item():.4f}\tValid.: {valid_acc:.4f}")
         pbar.write(      f"\tTest:   {test_loss.item():.4f}\tTest:   {test_acc:.4f}\n")
-        pbar.update(1)
         # fmt:on

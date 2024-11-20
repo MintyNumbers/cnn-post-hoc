@@ -49,6 +49,7 @@ def plot_conv_activations(activations: dict[str, Tensor], layer: str) -> None:
             axes[col].axis("off")
             axes[col].set_title(f"Filter {idx}")
 
+    plt.tight_layout()
     plt.show()
 
 
