@@ -20,7 +20,7 @@ class ConvolutionalNeuralNetwork(Module):
         )
 
         self.classifier = Sequential(
-            Linear(in_features=64 * 16 * 12, out_features=5),
+            Linear(in_features=64 * 16 * 12, out_features=10),
         )
 
     def forward(self, x: Tensor) -> Tensor:

@@ -1,35 +1,39 @@
 from glob import glob
-from os import makedirs
+from os import listdir, makedirs
 from shutil import copy
+
+from torchvision.io import decode_image
 
 
 def train_test_split() -> None:
     """Helper function to split the downloaded Bark classification dataset into a train and test subset."""
 
-    # choosing bark types, which were photographed using similar angles
-    # this prevents the CNN from learning inconsequential data
-    # furthermore all categories have about the same amount of images
-    # this lowers biases of the CNN
-    # TODO: cutting amount of samples down to the minimum among the categories (done manually)
-    # fmt:off
-    TREE_SPECIES: list[str] = [     # total | train / test
-        "Adenanthera microsperma",  # 80    | 73    / 7
-        "Cananga odorata",          # 80    | 73    / 7
-        "Cedrus",                   # 80    | 73    / 7
-        "Cocos nucifera",           # 80    | 73    / 7
-        "Dalbergia oliveri",        # 80    | 73    / 7       
-    ]                               # 400   | 365   / 35
-    # fmt:on
+    # Tree species list that will be classified by the CNN
+    # Only species with at least num_samples samples will be used.
+    # The second integer is the number of train samples
+    num_samples = 109, 99
+    TREE_SPECIES: list[str] = []
+
+    # no checking required as top-level directory contains only subdirectories
+    # and subdirectories only contain files
+    for species in listdir("./data/BarkVN-50/BarkVN-50_mendeley/"):
+        num_dir = len(listdir(f"./data/BarkVN-50/BarkVN-50_mendeley/{species}/"))
+        image = decode_image(glob(f"./data/BarkVN-50/BarkVN-50_mendeley/{species}/*")[0])
+        if num_dir >= num_samples[0] and image.shape[1] == 404 and image.shape[2] == 303:
+            print(num_dir, species)
+            TREE_SPECIES.append(species)
 
     for species in TREE_SPECIES:
         makedirs(f"./data/BarkVN-50/Train/{species}", exist_ok=False)
         makedirs(f"./data/BarkVN-50/Test/{species}", exist_ok=False)
         image_paths: list[str] = glob(f"./data/BarkVN-50/BarkVN-50_mendeley/{species}/*")
         image_paths.sort()
-        train_test_split_index = int(image_paths.__len__() * 0.9)
 
         for i, image_path in enumerate(image_paths):
-            if i <= train_test_split_index:
-                copy(image_path, f"./data/BarkVN-50/Train/{species}/")
+            if i < num_samples[0]:
+                if i < num_samples[1]:
+                    copy(image_path, f"./data/BarkVN-50/Train/{species}/")
+                else:
+                    copy(image_path, f"./data/BarkVN-50/Test/{species}/")
             else:
-                copy(image_path, f"./data/BarkVN-50/Test/{species}/")
+                break

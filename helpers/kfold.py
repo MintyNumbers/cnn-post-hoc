@@ -76,7 +76,7 @@ def train_cnn_kfold(
     kf = KFold(n_splits=num_kfold, shuffle=True, random_state=0)
     pbar = tqdm(total=num_kfold, desc="K-Fold")
     pbar.write("K-Fold\tLoss\t\tAccuracy")
-    for fold, (train_idx, test_idx) in enumerate(kf.split(train_dataset)):
+    for fold, (train_idx, test_idx) in enumerate(kf.split(train_dataset), 1):
         model = ConvolutionalNeuralNetwork().to(device)
         if sgd:
             optimizer = SGD(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
@@ -85,12 +85,12 @@ def train_cnn_kfold(
 
         # Train model with each K-Fold
         model.train()
-        train_loader = DataLoader(dataset=train_dataset, batch_size=40, sampler=SubsetRandomSampler(train_idx))
+        train_loader = DataLoader(dataset=train_dataset, batch_size=20, sampler=SubsetRandomSampler(train_idx))
         train_loss, train_acc = train_kfold(epoch_per_kfold, train_loader)
 
         # Validate and Test resulting model
         model.eval()
-        valid_loader = DataLoader(dataset=train_dataset, batch_size=40, sampler=SubsetRandomSampler(test_idx))
+        valid_loader = DataLoader(dataset=train_dataset, batch_size=20, sampler=SubsetRandomSampler(test_idx))
         valid_loss, valid_acc = eval_kfold(valid_loader)
         test_loss, test_acc = eval_kfold(test_loader)
 
