@@ -5,11 +5,13 @@ from torch.nn.functional import one_hot
 from torch.utils.data import Dataset
 from torchvision.io import decode_image
 from torchvision.transforms.functional import rgb_to_grayscale
+from torchvision.transforms.v2 import Compose
 
 
 class BarkVN50Dataset(Dataset):
-    def __init__(self, train: bool, device: device):
+    def __init__(self, train: bool, device: device, transforms: Compose = None):
         self.device = device
+        self.transforms = transforms
 
         if train:
             self.image_paths = glob("./data/BarkVN-50/Train/*/*")
@@ -49,4 +51,8 @@ class BarkVN50Dataset(Dataset):
         return self.images.shape[0]
 
     def __getitem__(self, index) -> tuple[Tensor, Tensor]:
-        return self.images[index], self.labels[index]
+        if self.transforms:
+            image = self.transforms(self.images[index])
+        else:
+            image = self.images[index]
+        return image, self.labels[index]
