@@ -11,7 +11,7 @@ __all__ = [
     "train",
 ]
 
-from .activations import filter_activation_maximization, plot_conv_activations, setup_hooks  # noqa: F401
+from .activations import filter_activation_maximization, plot_image_activations, setup_hooks  # noqa: F401
 from .cnn import ConvolutionalNeuralNetwork  # noqa: F401
 from .dataset import BarkVN50Dataset  # noqa: F401
 from .evaluate import evaluate_cnn  # noqa: F401

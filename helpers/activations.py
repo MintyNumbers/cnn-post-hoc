@@ -4,6 +4,7 @@ from torch.optim import Adam
 from tqdm.notebook import trange
 
 from helpers.cnn import ConvolutionalNeuralNetwork
+from helpers.dataset import BarkVN50Dataset
 
 
 def setup_hooks(model: ConvolutionalNeuralNetwork, activations: dict[str, Tensor]) -> dict[str, Tensor]:
@@ -24,50 +25,79 @@ def setup_hooks(model: ConvolutionalNeuralNetwork, activations: dict[str, Tensor
     return activations
 
 
-def plot_conv_activations(activations: dict[str, Tensor], layer: str) -> None:
-    """Plots activations of Convolutional layers."""
+def plot_image_activations(
+    index: int, test_dataset: BarkVN50Dataset, model: ConvolutionalNeuralNetwork, activations: dict[str, Tensor]
+):
+    def plot_conv_activations(layer: str) -> None:
+        """Plots activations of Convolutional layers."""
 
-    activation = activations[layer]
+        activation = activations[layer]
 
-    # Number of filters in conv1
-    print(f"Shape of activation: {activation.shape}")
-    num_filters = activation.shape[1]
+        # Number of filters in conv1
+        print(f"Shape of activation: {activation.shape}")
+        num_filters = activation.shape[1]
 
-    # Plot the activation maps
-    fig, axes = plt.subplots(num_filters // 8, 8, figsize=(15, num_filters * 2 // 8))
+        # Plot the activation maps
+        fig, axes = plt.subplots(
+            nrows=max(num_filters // 8, 1),
+            ncols=min(8, num_filters),
+            figsize=(15, max(num_filters * 3 // 8, 3)),
+        )
 
-    fig.suptitle(f"Filters of activation layer {layer}", fontsize=16)
-    for idx in range(num_filters):
-        row = idx // 8
-        col = idx % 8
-        if num_filters > 8:
-            axes[row, col].imshow(activation[0, idx].cpu(), cmap="gray")
-            axes[row, col].axis("off")
-            axes[row, col].set_title(f"Filter {idx}")
-        else:
-            axes[col].imshow(activation[0, idx].cpu(), cmap="gray")
-            axes[col].axis("off")
-            axes[col].set_title(f"Filter {idx}")
+        fig.suptitle(f"Filters of activation layer {layer}", fontsize=16)
+        for idx in range(num_filters):
+            row = idx // 8
+            col = idx % 8
+            if num_filters > 8:
+                axes[row, col].imshow(activation[0, idx].cpu(), cmap="gray")
+                axes[row, col].axis("off")
+                axes[row, col].set_title(f"Filter {idx}")
+            else:
+                axes[col].imshow(activation[0, idx].cpu(), cmap="gray")
+                axes[col].axis("off")
+                axes[col].set_title(f"Filter {idx}")
 
-    plt.tight_layout()
+        plt.tight_layout()
+        plt.show()
+
+    def plot_fc_activations(layer: str):
+        """Plots activations of Fully Connected (Linear) layers."""
+
+        # Get activations from the first fully connected layer
+        activation = activations[layer]
+
+        print(f"Shape of fc1 activations: {activation.shape}")
+
+        # Plot the activations as a bar graph
+        plt.figure(figsize=(4, 3))
+        plt.bar(range(activation.shape[1]), activation[0].cpu().numpy())
+        plt.title(f"Activations of {layer} Layer")
+        plt.xlabel("Neuron Index")
+        plt.ylabel("Activation")
+        plt.show()
+
+    # selecting the image
+    image = test_dataset.images[index : index + 1]
+    label = test_dataset.labels[index]
+
+    # Display the input image
+    plt.imshow(image.squeeze(), cmap="gray")
+    plt.title(f"Input Image - Label: {label}")
+    plt.axis("off")
     plt.show()
 
+    # Run the model on the sample image
+    _ = model(image)
 
-def plot_fc_activations(activations: dict[str, Tensor], layer: str):
-    """Plots activations of Fully Connected (Linear) layers."""
+    # plot FC activations
+    plot_fc_activations("linear")
 
-    # Get activations from the first fully connected layer
-    activation = activations[layer]
+    # Get activations from the first convolutional layer
+    plot_conv_activations("cnn0")
 
-    print(f"Shape of fc1 activations: {activation.shape}")
-
-    # Plot the activations as a bar graph
-    plt.figure(figsize=(4, 3))
-    plt.bar(range(activation.shape[1]), activation[0].cpu().numpy())
-    plt.title(f"Activations of {layer} Layer")
-    plt.xlabel("Neuron Index")
-    plt.ylabel("Activation")
-    plt.show()
+    # Get activations from the second convolutional layer
+    if model.cnn.__len__() > 5:
+        plot_conv_activations("cnn4")
 
 
 def filter_activation_maximization(
@@ -110,6 +140,9 @@ def filter_activation_maximization(
         hook.remove()
         return input_image.detach()
 
+    if model.cnn.__len__() <= 5:
+        return
+
     layer = model.cnn[cnn_layer_num]
     num_filters = model.cnn[cnn_layer_num - 1].out_channels
 
@@ -120,7 +153,11 @@ def filter_activation_maximization(
         maximized_images.append(am_image)
 
     # Plot the activation maps
-    fig, axes = plt.subplots(num_filters // 8, 8, figsize=(15, num_filters * 3 // 8))
+    fig, axes = plt.subplots(
+        nrows=max(num_filters // 8, 1),
+        ncols=min(8, num_filters),
+        figsize=(15, max(num_filters * 3 // 8, 3)),
+    )
 
     fig.suptitle(f"Filters of activation layer cnn{cnn_layer_num}", fontsize=16)
     for idx, am_image in enumerate(maximized_images):
