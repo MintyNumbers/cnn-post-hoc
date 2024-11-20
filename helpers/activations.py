@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
+from numpy import argmax
 from torch import Tensor, clamp, mean, randn
+from torch.nn.functional import softmax
 from torch.optim import Adam
 from tqdm.notebook import trange
 
@@ -30,6 +32,9 @@ def plot_image_activations(
 ):
     def plot_conv_activations(layer: str) -> None:
         """Plots activations of Convolutional layers."""
+
+        if model.cnn.__len__() <= 5:
+            return
 
         activation = activations[layer]
 
@@ -66,25 +71,32 @@ def plot_image_activations(
         # Get activations from the first fully connected layer
         activation = activations[layer]
 
-        print(f"Shape of fc1 activations: {activation.shape}")
-
         # Plot the activations as a bar graph
-        plt.figure(figsize=(4, 3))
-        plt.bar(range(activation.shape[1]), activation[0].cpu().numpy())
-        plt.title(f"Activations of {layer} Layer")
-        plt.xlabel("Neuron Index")
-        plt.ylabel("Activation")
+        fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(8, 3))
+        fig.suptitle(f"Activations of {layer} Layer", fontsize=16)
+        axes[0].set_title("Activations (without Softmax)")
+        axes[0].bar(range(activation.shape[1]), activation[0].cpu().numpy())
+        axes[1].set_title("Activations (with Softmax)")
+        axes[1].bar(range(activation.shape[1]), softmax(activation[0], dim=0).cpu().numpy())
+        for i in [0, 1]:
+            axes[i].set_xlabel("Neuron Index")
+            axes[i].set_ylabel("Activation")
+
+        plt.tight_layout()
         plt.show()
 
-    # selecting the image
+    def plot_image(image: Tensor, label: int):
+        plt.imshow(image.squeeze(), cmap="gray")
+        plt.title(f"Input Image - Label: {label}")
+        plt.axis("off")
+        plt.show()
+
+    # Selecting the image
     image = test_dataset.images[index : index + 1]
-    label = test_dataset.labels[index]
+    label = argmax(test_dataset.labels[index].cpu().numpy())
 
     # Display the input image
-    plt.imshow(image.squeeze(), cmap="gray")
-    plt.title(f"Input Image - Label: {label}")
-    plt.axis("off")
-    plt.show()
+    plot_image(image, int(label))
 
     # Run the model on the sample image
     _ = model(image)
@@ -96,8 +108,7 @@ def plot_image_activations(
     plot_conv_activations("cnn0")
 
     # Get activations from the second convolutional layer
-    if model.cnn.__len__() > 5:
-        plot_conv_activations("cnn4")
+    plot_conv_activations("cnn4")
 
 
 def filter_activation_maximization(
