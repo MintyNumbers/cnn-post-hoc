@@ -8,19 +8,19 @@ class ConvolutionalNeuralNetwork(Module):
         super(ConvolutionalNeuralNetwork, self).__init__()
 
         self.cnn = Sequential(
-            Conv2d(in_channels=1, out_channels=64, kernel_size=7, padding=3, stride=1),  # 64 * 404 * 303
+            Conv2d(in_channels=1, out_channels=8, kernel_size=5, padding=2, stride=1),  # 8 * 404 * 303
             ReLU(),
-            BatchNorm2d(num_features=64),
-            MaxPool2d(kernel_size=7, stride=7, padding=0),  # 64 * 57 * 43
-            Conv2d(in_channels=64, out_channels=128, kernel_size=7, padding=3, stride=1),  # 128 * 57 * 43
+            BatchNorm2d(num_features=8),
+            MaxPool2d(kernel_size=5, stride=5, padding=2),  # 8 * 81 * 61
+            Conv2d(in_channels=8, out_channels=16, kernel_size=5, padding=2, stride=1),  # 16 * 81 * 61
             ReLU(),
-            BatchNorm2d(num_features=128),
-            MaxPool2d(kernel_size=7, stride=7, padding=0),  # 128 * 8 * 6
+            BatchNorm2d(num_features=16),
+            MaxPool2d(kernel_size=5, stride=5, padding=2),  # 16 * 17 * 13
             Flatten(),
         )
 
         self.classifier = Sequential(
-            Linear(in_features=64 * 16 * 12, out_features=10),
+            Linear(in_features=16 * 17 * 13, out_features=10),
         )
 
     def forward(self, x: Tensor) -> Tensor:
