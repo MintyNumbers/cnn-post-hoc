@@ -12,6 +12,18 @@ class BarkVN50Dataset(Dataset):
     def __init__(self, train: bool, device: device, transforms: Compose = None):
         self.device = device
         self.transforms = transforms
+        self.classes = [
+            "Cocos nucifera",
+            "Dipterocarpus alatus",
+            "Eucalyptus",
+            "Ficus microcarpa",
+            "Hevea brasiliensis",
+            "Musa",
+            "Psidium guajava",
+            "Syzygium nervosum",
+            "Terminalia catappa",
+            "Veitchia merrilli",
+        ]
 
         if train:
             self.image_paths = glob("./data/BarkVN-50/Train/*/*")
