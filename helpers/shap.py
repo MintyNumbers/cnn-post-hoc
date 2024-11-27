@@ -17,6 +17,7 @@ def shap_evaluate_cnn(
     model: ConvolutionalNeuralNetwork,
     train_dataset: BarkVN50Dataset,
     test_dataset: BarkVN50Dataset,
+    test_image_index: int,
 ):
     def get_pred_label(input_images: Tensor) -> list[str]:
         test_outputs = model(input_images)
@@ -59,7 +60,7 @@ def shap_evaluate_cnn(
     test_loader = DataLoader(test_dataset, batch_size=10, shuffle=False)
     for test_images, targets in tqdm(test_loader):
         # Get 1 sample of each class and modify it to compare SHAP values
-        input_images = generate_input_images(test_images[0])
+        input_images = generate_input_images(test_images[test_image_index])
 
         # Calculate and plot SHAP values for test image batch
         shap_values = explainer.shap_values(input_images)
