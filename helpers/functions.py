@@ -1,4 +1,6 @@
-from torch import Tensor, max
+from cv2 import COLOR_BGR2GRAY, COLOR_GRAY2BGR, cvtColor, rectangle
+from torch import Tensor, empty, from_numpy, max
+from torchvision.transforms.v2.functional import gaussian_noise, rotate
 
 
 def count_correct_label_batch(targets: Tensor, outputs: Tensor) -> int:
@@ -40,3 +42,28 @@ def one_hot_to_string_label_batch(one_hot_label: Tensor) -> list[str]:
         else:                   string_labels.append("")                     # noqa: E701
         # fmt:on
     return string_labels
+
+
+def generate_augmented_input_images(original_image: Tensor) -> Tensor:
+    input_images = empty(5, 1, 404, 303)
+
+    # original image
+    input_images[0] = original_image
+
+    # image with noise
+    input_images[1] = gaussian_noise(original_image)
+
+    # rotated iamge
+    input_images[2] = rotate(original_image, 30)
+
+    # image with black square
+    black_rectangle_image = cvtColor(original_image.permute(1, 2, 0).numpy(), COLOR_GRAY2BGR)
+    rectangle(black_rectangle_image, pt1=(100, 100), pt2=(200, 200), color=(0, 0, 0), thickness=-1)
+    input_images[3] = from_numpy(cvtColor(black_rectangle_image, COLOR_BGR2GRAY)).unsqueeze(0)
+
+    # image with plaid square
+    black_rectangle_image_2 = cvtColor(original_image.permute(1, 2, 0).numpy(), COLOR_GRAY2BGR)
+    rectangle(black_rectangle_image_2, pt1=(100, 100), pt2=(300, 300), color=(0, 0, 0), thickness=-1)
+    input_images[4] = from_numpy(cvtColor(black_rectangle_image_2, COLOR_BGR2GRAY)).unsqueeze(0)
+
+    return input_images

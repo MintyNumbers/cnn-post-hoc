@@ -17,6 +17,7 @@ from .dataset import BarkVN50Dataset  # noqa: F401
 from .evaluate import evaluate_cnn  # noqa: F401
 from .functions import (  # noqa: F401
     count_correct_label_batch,
+    generate_augmented_input_images,
     one_hot_to_numeric_label_batch,
     one_hot_to_string_label_batch,
 )
