@@ -20,6 +20,7 @@ from .functions import (  # noqa: F401
     generate_augmented_input_images,
     one_hot_to_numeric_label_batch,
     one_hot_to_string_label_batch,
+    visualize_test_dataset,
 )
 from .kfold import train_cnn_kfold  # noqa: F401
 from .lime import lime_evaluate_cnn  # noqa: F401

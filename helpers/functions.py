@@ -1,6 +1,11 @@
+import matplotlib.pyplot as plt
 from cv2 import COLOR_BGR2GRAY, COLOR_GRAY2BGR, cvtColor, rectangle
 from torch import Tensor, empty, from_numpy, max
+from torch.utils.data import DataLoader
 from torchvision.transforms.v2.functional import gaussian_noise, rotate
+
+from helpers.cnn import ConvolutionalNeuralNetwork
+from helpers.dataset import BarkVN50Dataset
 
 
 def count_correct_label_batch(targets: Tensor, outputs: Tensor) -> int:
@@ -67,3 +72,22 @@ def generate_augmented_input_images(original_image: Tensor) -> Tensor:
     input_images[4] = from_numpy(cvtColor(black_rectangle_image_2, COLOR_BGR2GRAY)).unsqueeze(0)
 
     return input_images
+
+
+def visualize_test_dataset(test_dataset: BarkVN50Dataset, model: ConvolutionalNeuralNetwork):
+    loader = DataLoader(test_dataset, batch_size=10, shuffle=False)
+
+    for images, labels in loader:
+        fig, axes = plt.subplots(2, 5, figsize=(25, 7))
+        fig.suptitle(f"True label: {one_hot_to_numeric_label_batch(labels)[0].item()}", fontsize=16)
+        pred_labels = one_hot_to_numeric_label_batch(model(images))
+
+        for i in range(images.shape[0]):
+            col = i % 5
+            row = 0 if i < 5 else 1
+            axes[row, col].imshow(images[i].squeeze(), cmap="gray")
+            axes[row, col].axis("off")
+            axes[row, col].set_title(f"Pred: {pred_labels[i].item()}")
+
+        plt.tight_layout()
+        plt.show()
